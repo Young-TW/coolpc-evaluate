@@ -1,6 +1,6 @@
 use std::fs::{self, File};
 use std::io::{self, Write};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::Duration;
 
 const CACHE_EXPIRATION: Duration = Duration::from_secs(60 * 60); // 1 小時有效期限
 

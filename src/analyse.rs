@@ -309,17 +309,6 @@ fn analyse_fan(item_name: &str) -> ProductInfo {
     }
 }
 
-fn analyse_keyboard(item_name: &str) -> ProductInfo {
-    ProductInfo {
-        category: "Keyboard".to_string(),
-        brand: Some("Keyboard Brand".to_string()), // 可以根據需求進一步解析
-        model: Some(item_name.to_string()),
-        specs: Some("Keyboard specs".to_string()), // 可以根據需求進一步解析
-        price: None,
-        specific_model: None,
-    }
-}
-
 fn analyse_peripherals(item_name: &str) -> ProductInfo {
     ProductInfo {
         category: "Keyboard & Mouse".to_string(),

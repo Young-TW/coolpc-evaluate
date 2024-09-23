@@ -1,6 +1,5 @@
-mod analyse;
-mod cache;
-mod request;
+use coolpc_evaluate::request;
+use coolpc_evaluate::{analyse, cache};
 
 use std::error::Error;
 
@@ -22,8 +21,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     if items.is_empty() {
         println!("無法取得任何項目或價格");
     } else {
-        for (category_id, item_name, price) in &items {
-            let analysed_item = analyse::analyse_item_by_category(category_id, item_name, price);
+        for item in &items {
+            let analysed_item = analyse::analyse_item_by_category(item);
             println!("{:?}", analysed_item);
         }
     }

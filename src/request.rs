@@ -3,42 +3,46 @@ use reqwest::blocking::get;
 use scraper::{Html, Selector};
 use std::error::Error;
 
-pub fn fetch_items(url: &str) -> Result<Vec<(String, String)>, Box<dyn Error>> {
+pub fn fetch_page(url: &str) -> Result<String, Box<dyn Error>> {
     let response = get(url)?;
 
     if response.status().is_success() {
         let body = response.text()?;
-        let document = Html::parse_document(&body);
+        Ok(body)
+    } else {
+        println!("無法取得網頁內容");
+        Err("無法取得網頁內容".into())
+    }
+}
 
-        let select_selector = Selector::parse("select").unwrap();
-        let option_selector = Selector::parse("option").unwrap();
+pub fn parse_items(body: &str) -> Result<Vec<(String, String)>, Box<dyn Error>> {
+    let document = Html::parse_document(body);
 
-        let price_regex = Regex::new(r"\$([0-9,]+)").unwrap();
+    let select_selector = Selector::parse("select").unwrap();
+    let option_selector = Selector::parse("option").unwrap();
 
-        let mut items: Vec<(String, String)> = Vec::new();
+    let price_regex = Regex::new(r"\$([0-9,]+)").unwrap();
 
-        for select in document.select(&select_selector) {
-            if let Some(_name) = select.value().attr("name") {
-                for option in select.select(&option_selector) {
-                    let option_text = option.text().collect::<Vec<_>>().join("");
+    let mut items: Vec<(String, String)> = Vec::new();
 
-                    if let Some(captures) = price_regex.captures(&option_text) {
-                        let price = captures.get(1).unwrap().as_str().to_string();
-                        let item_name = option_text
-                            .split(',')
-                            .next()
-                            .unwrap_or("")
-                            .trim()
-                            .to_string();
-                        items.push((item_name, price));
-                    }
+    for select in document.select(&select_selector) {
+        if let Some(_name) = select.value().attr("name") {
+            for option in select.select(&option_selector) {
+                let option_text = option.text().collect::<Vec<_>>().join("");
+
+                if let Some(captures) = price_regex.captures(&option_text) {
+                    let price = captures.get(1).unwrap().as_str().to_string();
+                    let item_name = option_text
+                        .split(',')
+                        .next()
+                        .unwrap_or("")
+                        .trim()
+                        .to_string();
+                    items.push((item_name, price));
                 }
             }
         }
-
-        Ok(items)
-    } else {
-        println!("無法取得網頁內容");
-        Ok(Vec::new())
     }
+
+    Ok(items)
 }

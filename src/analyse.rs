@@ -99,22 +99,11 @@ fn analyse_cpu(item_name: &str) -> ProductInfo {
     .trim()
     .to_string();
 
-    // 清除提取的部分，保留剩餘名稱
-    let cleaned_model = item_name
-        .replace(brand.as_deref().unwrap_or(""), "")
-        .replace(cores_threads.as_deref().unwrap_or(""), "")
-        .replace(frequency.as_deref().unwrap_or(""), "")
-        .replace(tdp.as_deref().unwrap_or(""), "")
-        .replace(igpu.as_deref().unwrap_or(""), "")
-        .replace(specific_model.as_deref().unwrap_or(""), "")
-        .trim()
-        .to_string();
-
     // 返回解析結果，不處理價格
     ProductInfo {
         category: "CPU".to_string(),
         brand,
-        model: Some(cleaned_model), // 保留清理後的 model
+        model: Some(item_name.to_string()),
         specs: Some(specs),
         price: None,
         specific_model, // 新增具體的型號欄位
@@ -166,23 +155,12 @@ fn analyse_motherboard(item_name: &str) -> ProductInfo {
     .trim()
     .to_string();
 
-    // 清理剩餘名稱
-    let cleaned_model = item_name
-        .replace(brand.as_deref().unwrap_or(""), "")
-        .replace(form_factor.as_deref().unwrap_or(""), "")
-        .replace(lan.as_deref().unwrap_or(""), "")
-        .replace(wifi.as_deref().unwrap_or(""), "")
-        .replace(power_phases.as_deref().unwrap_or(""), "")
-        .replace(specific_model.as_deref().unwrap_or(""), "")
-        .trim()
-        .to_string();
-
     // 返回解析結果
     ProductInfo {
         category: "Motherboard".to_string(),
         brand,
-        model: Some(cleaned_model), // 清理後的 model
-        specs: Some(specs),         // 組合好的規格
+        model: Some(item_name.to_string()),
+        specs: Some(specs), // 組合好的規格
         price: None,
         specific_model, // 具體型號
     }

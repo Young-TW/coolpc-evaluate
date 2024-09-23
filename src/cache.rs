@@ -24,5 +24,7 @@ pub fn get_cache(cache_file: &str) -> Option<String> {
 // 寫入快取
 pub fn write_cache(cache_file: &str, data: &str) -> io::Result<()> {
     let mut file = File::create(cache_file)?;
-    file.write_all(data.as_bytes())
+    file.write_all(data.as_bytes())?;
+    file.flush()?; // 確保數據已寫入硬碟
+    Ok(())
 }

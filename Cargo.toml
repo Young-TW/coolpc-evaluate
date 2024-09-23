@@ -6,4 +6,7 @@ edition = "2021"
 [dependencies]
 reqwest = { version = "0.11", features = ["blocking"] }
 scraper = "0.13.0"
-regex = "1.7.1"
+regex = "1.10.6"
+gtk = "0.18.1"
+gio = "0.20.1"
+glib = "0.20.3"

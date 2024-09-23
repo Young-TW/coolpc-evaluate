@@ -5,6 +5,7 @@ pub struct ProductInfo {
     pub model: Option<String>,
     pub specs: Option<String>,
     pub price: Option<String>,
+    pub specific_model: Option<String>,
 }
 
 // 根據不同的 category_id 來分類解析
@@ -40,13 +41,71 @@ pub fn analyse_item_by_category(category_id: &str, item_name: &str, price: &str)
     }
 }
 
+use regex::Regex;
+
 fn analyse_cpu(item_name: &str, price: &str) -> ProductInfo {
+    // 使用正則表達式來解析型號中的 CPU 規格
+    let brand_regex = Regex::new(r"(Intel|AMD)").unwrap();
+    let cores_threads_regex = Regex::new(r"(\d+)核/(\d+)緒").unwrap();
+    let frequency_regex = Regex::new(r"(\d+(\.\d+)?)GHz").unwrap();
+    let tdp_regex = Regex::new(r"(\d+)W").unwrap();
+    let igpu_regex = Regex::new(r"(內顯|無內顯)").unwrap();
+    let model_regex = Regex::new(r"(i\d|R\d|Ryzen|Xeon)[\w\-]+").unwrap();
+
+    // 提取 CPU 的品牌（Intel 或 AMD）
+    let brand = brand_regex.find(item_name).map(|m| m.as_str().to_string());
+
+    // 提取 CPU 的核心數和執行緒數
+    let cores_threads = cores_threads_regex
+        .captures(item_name)
+        .map(|caps| format!("{}核/{}緒", &caps[1], &caps[2]));
+
+    // 提取 CPU 的頻率
+    let frequency = frequency_regex
+        .captures(item_name)
+        .map(|caps| format!("{}GHz", &caps[1]));
+
+    // 提取 CPU 的 TDP (瓦特數)
+    let tdp = tdp_regex
+        .captures(item_name)
+        .map(|caps| format!("{}W", &caps[1]));
+
+    // 判斷是否包含內顯
+    let igpu = igpu_regex.find(item_name).map(|m| m.as_str().to_string());
+
+    // 提取具體型號
+    let specific_model = model_regex.find(item_name).map(|m| m.as_str().to_string());
+
+    // 將解析的規格組合為字串
+    let specs = format!(
+        "{} {} {} {}",
+        cores_threads.as_ref().map_or("未知核心/緒數", |v| v),
+        frequency.as_ref().map_or("未知頻率", |v| v),
+        tdp.as_ref().map_or("未知 TDP", |v| v),
+        igpu.as_ref().map_or("未知內顯狀態", |v| v)
+    )
+    .trim()
+    .to_string();
+
+    // 清除提取的部分，保留剩餘名稱
+    let cleaned_model = item_name
+        .replace(brand.as_deref().unwrap_or(""), "")
+        .replace(cores_threads.as_deref().unwrap_or(""), "")
+        .replace(frequency.as_deref().unwrap_or(""), "")
+        .replace(tdp.as_deref().unwrap_or(""), "")
+        .replace(igpu.as_deref().unwrap_or(""), "")
+        .replace(specific_model.as_deref().unwrap_or(""), "")
+        .trim()
+        .to_string();
+
+    // 返回解析結果
     ProductInfo {
         category: "CPU".to_string(),
-        brand: Some("Intel or AMD".to_string()), // 可以根據需求進一步解析
-        model: Some(item_name.to_string()),
-        specs: Some("CPU specs".to_string()), // 可以根據需求進一步解析
+        brand,
+        model: Some(cleaned_model), // 保留清理後的 model
+        specs: Some(specs),
         price: Some(price.to_string()),
+        specific_model, // 新增具體的型號欄位
     }
 }
 
@@ -57,6 +116,7 @@ fn analyse_motherboard(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Motherboard specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -67,6 +127,7 @@ fn analyse_ram(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("RAM specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -77,6 +138,7 @@ fn analyse_ssd(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("SSD specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -87,6 +149,7 @@ fn analyse_hdd(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("HDD specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -97,6 +160,7 @@ fn analyse_external_storage(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Storage specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -107,6 +171,7 @@ fn analyse_cooling(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Cooling specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -117,6 +182,7 @@ fn analyse_liquid_cooling(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Liquid Cooling specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -127,6 +193,7 @@ fn analyse_graphics_card(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Graphics Card specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -137,6 +204,7 @@ fn analyse_monitor(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Monitor specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -147,6 +215,7 @@ fn analyse_case(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Case specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -157,6 +226,7 @@ fn analyse_power_supply(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Power Supply specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -167,6 +237,7 @@ fn analyse_fan(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Fan specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -177,6 +248,7 @@ fn analyse_keyboard(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Keyboard specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -187,6 +259,7 @@ fn analyse_peripherals(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Keyboard & Mouse specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -197,6 +270,7 @@ fn analyse_mouse_pad(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Mouse specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -207,6 +281,7 @@ fn analyse_network_equipment(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Network Equipment specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -217,6 +292,7 @@ fn analyse_nas_ipcam(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("NAS / IPCAM specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -227,6 +303,7 @@ fn analyse_sound_card(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Sound Card specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -237,6 +314,7 @@ fn analyse_speakers(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Speakers specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -247,6 +325,7 @@ fn analyse_optical_drive(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Optical Drive specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -257,6 +336,7 @@ fn analyse_usb_storage(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("USB Storage specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -267,6 +347,7 @@ fn analyse_dashcam(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Dashcam specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -277,6 +358,7 @@ fn analyse_ups_printer(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("UPS / Printer specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -287,6 +369,7 @@ fn analyse_raid_card(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("RAID Card specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -297,6 +380,7 @@ fn analyse_adapters(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Adapter specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -307,6 +391,7 @@ fn analyse_os_software(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("OS / Software specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }
 
@@ -317,5 +402,6 @@ fn analyse_generic(item_name: &str, price: &str) -> ProductInfo {
         model: Some(item_name.to_string()),
         specs: Some("Generic specs".to_string()), // 可以根據需求進一步解析
         price: Some(price.to_string()),
+        specific_model: None,
     }
 }

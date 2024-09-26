@@ -13,3 +13,70 @@ Improving the usability of online valuation systems for coolpc
 - 自動對齊價格、型號、商品名稱
 - 過濾不必要的資訊
 - 依照價格、品牌、規格來篩選商品
+
+## Development Progress
+
+- [x] Cache HTML
+- [x] Web Crawler
+- [x] ProductInfo Data Scructure
+
+- [ ] Analyze item
+  - [x] Get price
+  - [x] CPU
+  - [ ] Motherboard
+  - [ ] RAM
+  - [ ] SSD
+  - [ ] HDD
+  - [ ] External Storage
+  - [ ] Cooling
+  - [ ] Liquid Cooling
+  - [ ] Graphics Card
+  - [ ] Monitor
+  - [ ] Case
+  - [ ] Power Supply
+  - [ ] Fan
+  - [ ] Peripheral
+  - [ ] Mouse Pad
+  - [ ] Network Equipment
+  - [ ] NAS and IPcam
+  - [ ] Sound Card
+  - [ ] Speaker
+  - [ ] Optical Drive
+  - [ ] USB Storage
+  - [ ] Dashcam
+  - [ ] UPS and Printer
+  - [ ] RAID Card
+  - [ ] Adapter
+  - [ ] OS and Software
+  - [ ] Generic
+
+- [ ] Test Function
+  - [ ] Analyze item
+  - [x] Get price
+  - [x] CPU
+  - [ ] Motherboard
+  - [ ] RAM
+  - [ ] SSD
+  - [ ] HDD
+  - [ ] External Storage
+  - [ ] Cooling
+  - [ ] Liquid Cooling
+  - [ ] Graphics Card
+  - [ ] Monitor
+  - [ ] Case
+  - [ ] Power Supply
+  - [ ] Fan
+  - [ ] Peripheral
+  - [ ] Mouse Pad
+  - [ ] Network Equipment
+  - [ ] NAS and IPcam
+  - [ ] Sound Card
+  - [ ] Speaker
+  - [ ] Optical Drive
+  - [ ] USB Storage
+  - [ ] Dashcam
+  - [ ] UPS and Printer
+  - [ ] RAID Card
+  - [ ] Adapter
+  - [ ] OS and Software
+  - [ ] Generic

@@ -1,3 +1,5 @@
+use clap::{Arg, Command};
+use coolpc_evaluate::analyse::analyse_item_by_category;
 use coolpc_evaluate::cache;
 use coolpc_evaluate::product::ProductInfo;
 use coolpc_evaluate::request;
@@ -11,6 +13,19 @@ use gtk::{
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
+    // 使用 clap 定義 CLI 參數
+    let matches = Command::new("CoolPC Evaluate")
+        .version("1.0")
+        .author("Your Name <your.email@example.com>")
+        .about("Fetches product info from CoolPC and displays it in GUI or CLI")
+        .arg(
+            Arg::new("cli")
+                .long("cli")
+                .help("Run in CLI mode, print all ProductInfo")
+                .action(clap::ArgAction::SetTrue), // 將 --cli 設為布爾標志
+        )
+        .get_matches();
+
     let url = "https://coolpc.com.tw/evaluate.php";
     let cache_file = "cache.html";
 
@@ -25,15 +40,29 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let items = request::parse_items_by_onchange(&body)?;
 
-    let app = Application::builder()
-        .application_id("com.example.coolpc")
-        .build();
+    // 檢查是否使用 --cli flag
+    if matches.get_flag("cli") {
+        // CLI 模式，列印所有 ProductInfo
+        for item in &items {
+            analyse_item_by_category(item);
+            println!(
+                "Model: {}\nPrice: {}\n",
+                item.model.as_ref().unwrap_or(&"N/A".to_string()),
+                item.price.as_ref().unwrap_or(&"N/A".to_string())
+            );
+        }
+    } else {
+        // GUI 模式
+        let app = Application::builder()
+            .application_id("com.example.coolpc")
+            .build();
 
-    app.connect_activate(move |app| {
-        build_ui(app, &items); // 將 items 傳入 GUI
-    });
+        app.connect_activate(move |app| {
+            build_ui(app, &items); // 將 items 傳入 GUI
+        });
 
-    app.run();
+        app.run();
+    }
 
     Ok(())
 }

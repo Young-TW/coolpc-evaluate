@@ -38,13 +38,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     };
 
-    let items = request::parse_items_by_onchange(&body)?;
+    let mut items = request::parse_items_by_onchange(&body)?;
 
     // 檢查是否使用 --cli flag
     if matches.get_flag("cli") {
         // CLI 模式，列印所有 ProductInfo
-        for item in &items {
-            analyse_item_by_category(item);
+        for item in &mut items {
+            *item = analyse_item_by_category(item);
             println!(
                 "Model: {}\nPrice: {}\n",
                 item.model.as_ref().unwrap_or(&"N/A".to_string()),
